@@ -166,9 +166,9 @@ def test(epoch):
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
         if not args.fp16:
-            torch.save(state, './checkpoint/'+args.net+'-ckpt.tar')
+            torch.save(state, './checkpoint/'+args.net+'-ckpt.t7')
         else:
-            torch.save(state, './checkpoint/'+args.net+'-'+'FP16-ckpt.tar')
+            torch.save(state, './checkpoint/'+args.net+'-'+'FP16-ckpt.t7')
         best_acc = acc
 
 list_loss = []
