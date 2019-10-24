@@ -53,5 +53,5 @@ input_names = [ "input_0" ]
 output_names = [ "output_0" ]
 
 print('exporting model to ONNX...')
-torch.onnx.export(model, input, args.model_out, verbose=True, input_names=input_names, output_names=output_names)
+torch.onnx.export(model, input, args.model_out, verbose=True, input_names=input_names, output_names=output_names, opset_version=9)
 print('model exported to {:s}'.format(args.model_out))
