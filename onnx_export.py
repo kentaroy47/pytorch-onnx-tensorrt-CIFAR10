@@ -28,13 +28,13 @@ print('running on device ' + str(device))
 #input = img_to_tensor(img).view(1, -1, img.size[1], img.size[0]).to(device)
 pixels = 32
 img = np.random.rand(pixels,pixels,3)
-input = torch.from_numpy(img).view(1,3,pixels,pixels).to(device)
+input = torch.from_numpy(img).view(1,3,pixels,pixels).float().to(device)
 #print('input image size {:d}x{:d}'.format(img.size[0], img.size[1]))
 print("input size is..", input.shape)
 
 # load the model
 from models import *
-model = ResNet18()
+model = MobileNetV2().to(device)
 
 #from fp16util import network_to_half
 #model = network_to_half(model)

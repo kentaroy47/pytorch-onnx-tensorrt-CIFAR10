@@ -95,7 +95,9 @@ if args.fp16:
     net = network_to_half(net)
 
 if device == 'cuda':
-    net = torch.nn.DataParallel(net) # make parallel
+    # net = torch.nn.DataParallel(net) # make parallel
+    """ can't use dataparallel for onnx..
+    see https://github.com/pytorch/pytorch/issues/13397 """
     cudnn.benchmark = True
 
 if args.resume:
