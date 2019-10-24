@@ -5,9 +5,7 @@ import torch
 from PIL import Image
 from torchvision.transforms import ToTensor
 import numpy as np
-#from model import Net
 import numpy as np
-from models import *
 
 # exporter settings
 parser = argparse.ArgumentParser()
@@ -37,9 +35,17 @@ print("input size is..", input.shape)
 # load the model
 from models import *
 model = ResNet18()
+
+#from fp16util import network_to_half
+#model = network_to_half(model)
+
+# wrap in data parallel
+model = torch.nn.DataParallel(model)
+
+print(model)
 checkpoint = torch.load(args.model)
 model.load_state_dict(checkpoint['net'])
-print(model)
+
 print("model set!")
 
 # export the model
