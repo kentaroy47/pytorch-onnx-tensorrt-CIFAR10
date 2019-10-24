@@ -1,7 +1,7 @@
 # pytorch-onnx-tensorrt-CIFAR10
 Train cifar10 networks and inference with tensorrt.
 
-** The Tensor RT inference is about 5 times faster than Pytorch on Jetson Nano :) **
+**The Tensor RT inference is about 5 times faster than Pytorch on Jetson Nano :)**
 
 Also note that FP16 pytorch models are quite fast too.
 
@@ -31,10 +31,21 @@ Pytorch FP16: 16ms
 TensorRT: 4.2ms
 
 ```
-pytorch inference took:  0.046734986305236814
-FP16 pytorch inference took:  0.01620328426361084
+running on device cuda:0
+input size is.. torch.Size([1, 3, 32, 32])
+model set!
+
+pytorch inference took:  0.10171955108642577
+pytorch FPS is:  314.5904563893649
+
+FP16 pytorch inference took:  0.02646958112716675
+FP16 pytorch FPS is:  1208.9348843966848
+
 exporting model to trt...
-conversion completed! took: 20.77101159095764
-trt inference took:  0.004269411563873291
+conversion completed! took: 16.530654668807983
+
+trt inference took:  0.006784510612487793
+trt FPS is:  4716.626124970569
+
 
 ```

@@ -41,7 +41,7 @@ model = model.eval().to(device)
 print("model set!")
 
 pytorch_time = []
-batch = 1
+batch = 32
 for x in range(100):
     
     img = np.random.rand(batch,pixels,pixels,3)
@@ -51,6 +51,7 @@ for x in range(100):
     toc = time.time()
     pytorch_time.append(toc-tic)
 print("pytorch inference took: ", np.mean(np.asarray(pytorch_time)))
+print("pytorch FPS is: ", 1/np.mean(np.asarray(pytorch_time))*batch)
 
 # try Pytorch FP16 inference
 from fp16util import network_to_half
@@ -65,6 +66,7 @@ for x in range(100):
     toc = time.time()
     pytorch_time.append(toc-tic)
 print("FP16 pytorch inference took: ", np.mean(np.asarray(pytorch_time)))
+print("FP16 pytorch FPS is: ", 1/np.mean(np.asarray(pytorch_time))*batch)
 
 del model2
 
@@ -74,11 +76,10 @@ output_names = [ "output_0" ]
 
 print('exporting model to trt...')
 tic = time.time()
-model_trt = torch2trt(model, [input])
+model_trt = torch2trt(model, [input], max_batch_size=batch)
 toc = time.time()
 print("conversion completed! took:", toc-tic)
 
-batch = 1
 trt_time = []
 for x in range(100):
     
@@ -89,4 +90,5 @@ for x in range(100):
     toc = time.time()
     trt_time.append(toc-tic)
 print("trt inference took: ", np.mean(np.asarray(trt_time)))
+print("trt FPS is: ", 1/np.mean(np.asarray(trt_time))*batch)
 
