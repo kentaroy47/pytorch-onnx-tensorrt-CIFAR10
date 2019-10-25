@@ -34,13 +34,13 @@ print("input size is..", input.shape)
 
 # load the model
 from models import *
-model = MobileNetV2().to(device)
+model = ResNet18().to(device)
 
+# this may not coexist with onnx.
 #from fp16util import network_to_half
 #model = network_to_half(model)
 
-# wrap in data parallel
-model = torch.nn.DataParallel(model)
+# DataParallel does not coexist with onnx.
 
 print(model)
 checkpoint = torch.load(args.model)
