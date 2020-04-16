@@ -16,7 +16,7 @@ from torchvision.models import *
 import os
 import argparse
 
-from models import *
+#from models import *
 from utils import progress_bar
 
 torch.backends.cudnn.benchmark = False
@@ -62,7 +62,7 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 # Model
 print('==> Building model..')
 class mymodel(nn.Module):
-    def __init__(self, basemodeel):
+    def __init__(self, basemodel):
         super(mymodel, self).__init__()
         self.features = basemodel
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False)
@@ -94,11 +94,11 @@ elif args.net=='res34':
     net = mymodel(basemodel)
 elif args.net=='res50':
     basemodel = resnet50(pretrained=True)
-    bbasemodel = nn.Sequential(*list(basemodel.children())[1:-2])
+    basemodel = nn.Sequential(*list(basemodel.children())[1:-2])
     net = mymodel(basemodel)
 elif args.net=='res101':
     basemodel = resnet101(pretrained=True)
-    bbasemodel = nn.Sequential(*list(basemodel.children())[1:-2])
+    basemodel = nn.Sequential(*list(basemodel.children())[1:-2])
     net = mymodel(basemodel)
 # net = PreActResNet18()
 # net = GoogLeNet()
