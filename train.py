@@ -11,6 +11,7 @@ import torch.backends.cudnn as cudnn
 
 import torchvision
 import torchvision.transforms as transforms
+from torchvision.models import *
 
 import os
 import argparse
@@ -21,7 +22,7 @@ from utils import progress_bar
 torch.backends.cudnn.benchmark = False
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
-parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
+parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 parser.add_argument('--net', default='res18', help='choose from res18(def), res34, res50, vgg, densenet, mobilenet, shufflenet, efficientnet, resnext')
 parser.add_argument('--fp16', action='store_true')
@@ -60,17 +61,45 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 
 # Model
 print('==> Building model..')
-# net = VGG('VGG19')
+class mymodel(nn.Module):
+    def __init__(self, basemodeel):
+        super(mymodel, self).__init__()
+        self.features = basemodel
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False)
+        if model_name == "res34" or model_name == "res18":
+            num_ch = 512
+        else:
+            num_ch = 2048
+        
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
+        self.fc1 = nn.Conv2d(num_ch, 10, 1)
+        
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.features(x)
+        x = self.avgpool(x)#.squeeze(2).squeeze(2)
+        x = self.fc1(x)
+        return x
+    
+model_name = args.net
 if args.net=='res18':
-    net = ResNet18()
+    basemodel = resnet18(pretrained=True)
+    basemodel = nn.Sequential(*list(basemodel.children())[1:-2])    
+    net = mymodel(basemodel) 
 elif args.net=='vgg':
     net = VGG('VGG19')
 elif args.net=='res34':
-    net = ResNet34()
+    basemodel = resnet34(pretrained=True)
+    basemodel = nn.Sequential(*list(basemodel.children())[1:-2])
+    net = mymodel(basemodel)
 elif args.net=='res50':
-    net = ResNet50()
+    basemodel = resnet50(pretrained=True)
+    bbasemodel = nn.Sequential(*list(basemodel.children())[1:-2])
+    net = mymodel(basemodel)
 elif args.net=='res101':
-    net = ResNet101()
+    basemodel = resnet101(pretrained=True)
+    bbasemodel = nn.Sequential(*list(basemodel.children())[1:-2])
+    net = mymodel(basemodel)
 # net = PreActResNet18()
 # net = GoogLeNet()
 elif args.net=='densenet': 
@@ -87,8 +116,9 @@ elif args.net=='efficientnet':
     net = Efficientnet()
 else:
     print("{} not found").format(args.net)
-# net = SENet18()
+
 net = net.to(device)
+print(net)
 
 if args.fp16:
     from fp16util import network_to_half
@@ -104,7 +134,7 @@ if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load('./checkpoint/ckpt.t7')
+    checkpoint = torch.load('./checkpoint/{}-ckpt.t7'.format(args.net))
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
@@ -123,7 +153,7 @@ def train(epoch):
         # set input output as float and send to device.
         inputs, targets = inputs.float().to(device), targets.long().to(device)
         optimizer.zero_grad()
-        outputs = net(inputs)
+        outputs = net(inputs).squeeze(2).squeeze(2)
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
@@ -146,7 +176,7 @@ def test(epoch):
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
-            outputs = net(inputs)
+            outputs = net(inputs).squeeze(2).squeeze(2)
             loss = criterion(outputs, targets)
 
             test_loss += loss.item()
